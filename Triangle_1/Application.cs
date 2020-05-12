@@ -26,9 +26,9 @@ namespace Triangle_1
 
         float[] colors =
         {
-            0.0f, 0.0f, 0.0f, //Bottom-left vertex
-            0.5f, 0.5f, 0.5f, //Bottom-right vertex
-            1.0f,  1.0f, 1.0f  //Top vertex
+            1.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 
+            0.0f, 0.0f, 1.0f   
         }; 
 
         int VertexBufferObject;
@@ -69,6 +69,8 @@ namespace Triangle_1
 
             shader.Use();
             GL.BindVertexArray(VertexArrayObject);
+
+            GL.PointSize(40);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
             Context.SwapBuffers();
