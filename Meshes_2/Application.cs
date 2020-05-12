@@ -19,37 +19,21 @@ namespace Meshes_2
             
         }
 
-        //float[] vertices =
+        //private Vertex[] vertices =
         //{
-        //    0.5f, 0.5f,  //Bottom-left vertex
-        //    0.5f, -0.5f, //Bottom-right vertex
-        //    -0.5f, -0.5f,  //Top vertex
-        //    -0.5f, 0.5f
-        //}; 
-
-        //float[] colors =
-        //{
-        //    1.0f, 0.0f, 0.0f,
-        //    0.0f, 1.0f, 0.0f, 
-        //    0.0f, 0.0f, 1.0f,
-        //    1.0f, 0.0f, 0.0f,
+        //    new Vertex(new Vector2(0.5f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
+        //    new Vertex(new Vector2(0.5f, -0.5f), new Vector3(0.0f, 0.0f, 1.0f)),
+        //    new Vertex(new Vector2(-0.5f, -0.5f), new Vector3(1.0f, 0.0f, 0.0f)),
+        //    new Vertex(new Vector2(-0.5f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
         //};
 
-        private Vertex[] vertices =
-        {
-            new Vertex(new Vector2(0.5f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
-            new Vertex(new Vector2(0.5f, -0.5f), new Vector3(0.0f, 0.0f, 1.0f)),
-            new Vertex(new Vector2(-0.5f, -0.5f), new Vector3(1.0f, 0.0f, 0.0f)),
-            new Vertex(new Vector2(-0.5f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
-        };
+        //private int[] indices =
+        //{
+        //    1, 2, 3,
+        //    0, 1, 3,
+        //};
 
-        private int[] indices =
-        {
-            1, 2, 3,
-            0, 1, 3,
-        };
-
-        private ImGuiController controller;
+        private ImGuiController _controller;
 
         private int _vertexBufferObject;
         private int _vertexArrayObject;
@@ -61,11 +45,11 @@ namespace Meshes_2
 
         protected override void OnLoad(EventArgs e)
         {
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            GL.ClearColor(0.95f, 0.95f, 0.95f, 1.0f);
 
             _shader = new Shader("shaders/shader.v", "shaders/shader.f");
 
-            controller = new ImGuiController();
+            _controller = new ImGuiController();
 
             _vertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(_vertexArrayObject);
@@ -77,13 +61,10 @@ namespace Meshes_2
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, _mesh.Vertices.Length * Unsafe.SizeOf<Vertex>(), _mesh.Vertices, BufferUsageHint.StaticDraw);
 
-            GL.VertexAttribPointer(_shader.GetAttributeLocation("aPosition"), 2, VertexAttribPointerType.Float, false, Unsafe.SizeOf<Vertex>(), 0);
+            GL.VertexAttribPointer(_shader.GetAttributeLocation("aPosition"), 3, VertexAttribPointerType.Float, false, Unsafe.SizeOf<Vertex>(), 0);
             GL.EnableVertexAttribArray(_shader.GetAttributeLocation("aPosition"));
 
-            //_colorBufferObject = GL.GenBuffer();
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, _colorBufferObject);
-            //GL.BufferData(BufferTarget.ArrayBuffer, colors.Length * sizeof(float), colors, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(_shader.GetAttributeLocation("aColor"), 3, VertexAttribPointerType.Float, false, Unsafe.SizeOf<Vertex>(), Unsafe.SizeOf<Vector2>());
+            GL.VertexAttribPointer(_shader.GetAttributeLocation("aColor"), 3, VertexAttribPointerType.Float, false, Unsafe.SizeOf<Vertex>(), Unsafe.SizeOf<Vector3>());
             GL.EnableVertexAttribArray(_shader.GetAttributeLocation("aColor"));
 
             _elementBufferObject = GL.GenBuffer();
@@ -93,8 +74,8 @@ namespace Meshes_2
             base.OnLoad(e);
         }
 
-        private float scale = 0.3f;
-
+        private float _scale = 0.3f;
+        private float _angle = 0.0f;
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -102,19 +83,25 @@ namespace Meshes_2
 
             _shader.Use();
 
-            controller.NewFrame(this);
+            _controller.NewFrame(this);
 
 
-            ImGui.SliderFloat("Scale", ref scale, 0, 3);
+            ImGui.SliderFloat("Scale", ref _scale, 0, 3);
+            ImGui.SliderFloat("Angle", ref _angle, 0, 2 * 3.14f);
 
-            _shader.SetUniform("scaleFactor", scale);
+            _shader.SetUniform("scaleFactor", _scale);
+            _shader.SetUniform("angle", _angle);
+
+            var model = Matrix4.CreateRotationY(_angle);
+
+            _shader.SetUniform("model", model);
 
             GL.BindVertexArray(_vertexArrayObject);
 
             //GL.PointSize(30);
             GL.DrawElements(PrimitiveType.Triangles, _mesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
-            controller.Render();
+            _controller.Render();
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
@@ -123,7 +110,7 @@ namespace Meshes_2
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
-            controller.SetWindowSize(Width, Height);
+            _controller.SetWindowSize(Width, Height);
 
             base.OnResize(e);
         }

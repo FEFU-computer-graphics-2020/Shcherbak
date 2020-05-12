@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 namespace Meshes_2
@@ -79,6 +80,11 @@ namespace Meshes_2
         public void SetUniform(string name, float val)
         {
             GL.Uniform1(GetUniformLocation(name), val);
+        }
+
+        public void SetUniform(string name, Matrix4 val)
+        {
+            GL.UniformMatrix4(GetUniformLocation(name), false, ref val);
         }
 
         public void Use()

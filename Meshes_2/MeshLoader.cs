@@ -47,8 +47,11 @@ namespace Meshes_2
                     var match = vertexRegex.Match(line);
 
                     var vertex = new Vertex(
-                        new Vector2(float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture), float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture)), 
-                        new Vector3(1.0f, 0.0f, 0.0f)
+                        new Vector3(
+                            float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture), 
+                            float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture),
+                            float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture)), 
+                        new Vector3(0.6f, 0.7f, 0.7f)
                         );
                     vertices.Add(vertex);
                 }
