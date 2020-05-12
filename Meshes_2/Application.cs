@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ImGuiNET;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
@@ -48,6 +49,8 @@ namespace Meshes_2
             0, 1, 3,
         };
 
+        private ImGuiController controller;
+
         private int _vertexBufferObject;
         private int _vertexArrayObject;
         private int _elementBufferObject;
@@ -61,6 +64,8 @@ namespace Meshes_2
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             _shader = new Shader("shaders/shader.v", "shaders/shader.f");
+
+            controller = new ImGuiController();
 
             _vertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(_vertexArrayObject);
@@ -88,20 +93,28 @@ namespace Meshes_2
             base.OnLoad(e);
         }
 
-        //private float scale = 0.0f;
+        private float scale = 0.3f;
+
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             _shader.Use();
-            _shader.SetUniform("scaleFactor", 3f);
 
+            controller.NewFrame(this);
+
+
+            ImGui.SliderFloat("Scale", ref scale, 0, 3);
+
+            _shader.SetUniform("scaleFactor", scale);
 
             GL.BindVertexArray(_vertexArrayObject);
 
             //GL.PointSize(30);
             GL.DrawElements(PrimitiveType.Triangles, _mesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+            controller.Render();
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
@@ -110,6 +123,8 @@ namespace Meshes_2
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
+            controller.SetWindowSize(Width, Height);
+
             base.OnResize(e);
         }
 
