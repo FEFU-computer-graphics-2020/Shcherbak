@@ -19,19 +19,19 @@ namespace Meshes_2
             
         }
 
-        //private Vertex[] vertices =
-        //{
-        //    new Vertex(new Vector2(0.5f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
-        //    new Vertex(new Vector2(0.5f, -0.5f), new Vector3(0.0f, 0.0f, 1.0f)),
-        //    new Vertex(new Vector2(-0.5f, -0.5f), new Vector3(1.0f, 0.0f, 0.0f)),
-        //    new Vertex(new Vector2(-0.5f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
-        //};
+        private Vertex[] vertices =
+        {
+            new Vertex(new Vector3(600.0f, 800.0f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
+            new Vertex(new Vector3(600.0f, 300.0f, 0.5f), new Vector3(0.0f, 0.0f, 1.0f)),
+            new Vertex(new Vector3(100.0f, 300.0f, 0.5f), new Vector3(1.0f, 0.0f, 0.0f)),
+            new Vertex(new Vector3(100.0f, 800.0f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
+        };
 
-        //private int[] indices =
-        //{
-        //    1, 2, 3,
-        //    0, 1, 3,
-        //};
+        private int[] indices =
+        {
+            1, 2, 3,
+            0, 1, 3,
+        };
 
         private ImGuiController _controller;
 
@@ -46,6 +46,7 @@ namespace Meshes_2
         protected override void OnLoad(EventArgs e)
         {
             GL.ClearColor(0.95f, 0.95f, 0.95f, 1.0f);
+            GL.Enable(EnableCap.DepthTest);
 
             _shader = new Shader("shaders/shader.v", "shaders/shader.f");
 
@@ -55,6 +56,9 @@ namespace Meshes_2
             GL.BindVertexArray(_vertexArrayObject);
 
             _mesh = MeshLoader.LoadMesh("mesh/mesh.obj"); 
+            //_mesh = MeshLoader.Quad(1, 1); 
+            
+            //_mesh = new Mesh(vertices, indices); 
 
             _vertexBufferObject = GL.GenBuffer();
             // copy our vertices array in a buffer for OpenGL to use
@@ -74,27 +78,54 @@ namespace Meshes_2
             base.OnLoad(e);
         }
 
-        private float _scale = 0.3f;
+        private float _scale = 1.0f;
         private float _angle = 0.0f;
+        private float _zDist = 0.0f; 
+        private bool _isPerspective = false;
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             _shader.Use();
 
             _controller.NewFrame(this);
 
 
-            ImGui.SliderFloat("Scale", ref _scale, 0, 3);
+            ImGui.SliderFloat("Scale", ref _scale, 0, 2);
             ImGui.SliderFloat("Angle", ref _angle, 0, 2 * 3.14f);
+            ImGui.SliderFloat("zDist", ref _zDist, 0, 20);
+
+            if (ImGui.RadioButton("Perspective", _isPerspective))
+            {
+                _isPerspective = true;
+            }
+
+            if (ImGui.RadioButton("Orthographics", !_isPerspective))
+            {
+                _isPerspective = false;
+            }
 
             _shader.SetUniform("scaleFactor", _scale);
             _shader.SetUniform("angle", _angle);
 
-            var model = Matrix4.CreateRotationY(_angle);
+            var model = Matrix4.CreateRotationY(_angle); 
+            model =  model * Matrix4.CreateTranslation(0, 0, -_zDist);
 
             _shader.SetUniform("model", model);
+
+
+            //var projection = Matrix4.CreateOrthographicOffCenter(0, Width, Height, 0, -2, 2);
+            //var projection = Matrix4.Identity;
+
+            //var projection = Matrix4.CreatePerspectiveOffCenter(0, Width, Height, 0, 0.1f, 100.0f);
+
+            var projection = _isPerspective 
+                ? Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI / 2), (float)Width / Height, 0.1f, 100.0f) 
+                : Matrix4.CreateOrthographic(2, 2, -1, 1);
+
+            _shader.SetUniform("projection", projection);
+
 
             GL.BindVertexArray(_vertexArrayObject);
 
