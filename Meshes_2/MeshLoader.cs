@@ -37,10 +37,10 @@ namespace Meshes_2
             {
                 Vertices = new[]
                 {
-                    new Vertex(new Vector3(width/2, height/2, 0.0f), new Vector3(1.0f, 1.0f, 1.0f)),
+                    new Vertex(new Vector3(width/2, height/2, 0.0f), new Vector3(0.0f, 0.0f, 1.0f)),
                     new Vertex(new Vector3(width/2, -height/2, 0.0f), new Vector3(0.0f, 0.0f, 1.0f)),
-                    new Vertex(new Vector3(-width/2, -height/2, 0.0f), new Vector3(1.0f, 0.0f, 0.0f)),
-                    new Vertex(new Vector3(-width/2, height/2, 0.0f), new Vector3(1.0f, 1.0f, 1.0f)),
+                    new Vertex(new Vector3(-width/2, -height/2, 0.0f), new Vector3(0.0f, 0.0f, 0.0f)),
+                    new Vertex(new Vector3(-width/2, height/2, 0.0f), new Vector3(1.0f, 1.0f, 0.0f)),
                 },
                 Indices = new []
                 {

@@ -39,7 +39,7 @@
     <None Include="mesh\mesh.mtl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="mesh\mesh.obj">
+    <None Include="mesh\mesh.objf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="OpenTK.dll.config" />

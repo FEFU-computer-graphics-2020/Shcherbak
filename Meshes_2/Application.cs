@@ -21,10 +21,10 @@ namespace Meshes_2
 
         private Vertex[] vertices =
         {
-            new Vertex(new Vector3(600.0f, 800.0f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
-            new Vertex(new Vector3(600.0f, 300.0f, 0.5f), new Vector3(0.0f, 0.0f, 1.0f)),
-            new Vertex(new Vector3(100.0f, 300.0f, 0.5f), new Vector3(1.0f, 0.0f, 0.0f)),
-            new Vertex(new Vector3(100.0f, 800.0f, 0.5f), new Vector3(1.0f, 1.0f, 1.0f)),
+            new Vertex(new Vector3(600.0f, 800.0f, 0.5f), new Vector3(0.0f, 0.0f, 0.0f)),
+            new Vertex(new Vector3(600.0f, 300.0f, 0.5f), new Vector3(0.0f, 0.0f, 0.0f)),
+            new Vertex(new Vector3(100.0f, 300.0f, 0.5f), new Vector3(0.0f, 0.0f, 0.0f)),
+            new Vertex(new Vector3(100.0f, 800.0f, 0.5f), new Vector3(0.0f, 0.0f, 0.0f)),
         };
 
         private int[] indices =
@@ -107,10 +107,10 @@ namespace Meshes_2
             }
 
             _shader.SetUniform("scaleFactor", _scale);
-            _shader.SetUniform("angle", _angle);
+            //_shader.SetUniform("angle", _angle);
 
-            var model = Matrix4.CreateRotationY(_angle); 
-            model =  model * Matrix4.CreateTranslation(0, 0, -_zDist);
+            var model = Matrix4.CreateRotationY(_angle);
+            model = model * Matrix4.CreateTranslation(0, 0, -_zDist);
 
             _shader.SetUniform("model", model);
 
@@ -119,9 +119,11 @@ namespace Meshes_2
             //var projection = Matrix4.Identity;
 
             //var projection = Matrix4.CreatePerspectiveOffCenter(0, Width, Height, 0, 0.1f, 100.0f);
+            //Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI / 2), (float)Width / Height, 0.1f, 100.0f)
+
 
             var projection = _isPerspective 
-                ? Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI / 2), (float)Width / Height, 0.1f, 100.0f) 
+                ? Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI / 2), (float)Width / Height, 0.1f, 100.0f)
                 : Matrix4.CreateOrthographic(2, 2, -1, 1);
 
             _shader.SetUniform("projection", projection);
